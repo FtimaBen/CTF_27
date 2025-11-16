@@ -46,32 +46,40 @@ jobs:
               --rename-globals true
           done
 
-      # 5. Update HTML to use obfuscated JS
-      - name: Update HTML
+      # 5. Copy HTML and update JS references directly into build root
+      - name: Copy HTML & update JS references
         run: |
-          mkdir -p build/html
+          mkdir -p build
           for html in private-repo/src/html/*.html; do
-            cp "$html" "build/html/$(basename $html)"
+            out="build/$(basename "$html")"
+            cp "$html" "$out"
             for jsfile in private-repo/src/js/*.js; do
               jsbase=$(basename "$jsfile")
-              sed -i "s|src=\".*$jsbase\"|src=\"js/$jsbase\"|g" "build/html/$(basename $html)"
+              sed -i "s|src=\"[^\"]*$jsbase\"|src=\"js/$jsbase\"|g" "$out"
             done
           done
 
-      # 6. Minify HTML
+      # 6. Minify HTML in-place
       - name: Minify HTML
         run: |
-          for html in build/html/*.html; do
+          for html in build/*.html; do
             html-minifier-terser "$html" -o "$html" \
               --collapse-whitespace --remove-comments --minify-css true --minify-js true
           done
 
-      # 7. Copy HTML root files
+      # 7. Copy media folder
+      - name: Copy media
+        run: |
+          mkdir -p build/media
+          cp -r private-repo/src/media/* build/media/
+
+
+      # 8. Copy HTML root files
       - name: Prepare final build
         run: |
           cp build/html/* build/
 
-      # 8. Deploy to GitHub Pages
+      # 9. Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
