@@ -1,0 +1,80 @@
+name: Build & Deploy Private Repo to GitHub Pages
+
+on:
+  workflow_dispatch:   # manual trigger
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout private repo
+      - name: Checkout Private Repo
+        uses: actions/checkout@v4
+        with:
+          repository: USERNAME/PRIVATE_REPO   # change to your private repo
+          token: ${{ secrets.PRIVATE_REPO_TOKEN }}
+          path: private-repo
+
+      # 2. Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      # 3. Install tools
+      - name: Install Tools
+        run: |
+          npm install -g javascript-obfuscator html-minifier-terser
+
+      # 4. Obfuscate JS
+      - name: Obfuscate JS
+        run: |
+          mkdir -p build/js
+          for file in private-repo/src/js/*.js; do
+            base=$(basename "$file")
+            javascript-obfuscator "$file" \
+              --output "build/js/$base" \
+              --compact true \
+              --self-defending true \
+              --control-flow-flattening true \
+              --string-array true \
+              --string-array-encoding base64 \
+              --rename-globals true
+          done
+
+      # 5. Update HTML to use obfuscated JS
+      - name: Update HTML
+        run: |
+          mkdir -p build/html
+          for html in private-repo/src/html/*.html; do
+            cp "$html" "build/html/$(basename $html)"
+            for jsfile in private-repo/src/js/*.js; do
+              jsbase=$(basename "$jsfile")
+              sed -i "s|src=\".*$jsbase\"|src=\"js/$jsbase\"|g" "build/html/$(basename $html)"
+            done
+          done
+
+      # 6. Minify HTML
+      - name: Minify HTML
+        run: |
+          for html in build/html/*.html; do
+            html-minifier-terser "$html" -o "$html" \
+              --collapse-whitespace --remove-comments --minify-css true --minify-js true
+          done
+
+      # 7. Copy HTML root files
+      - name: Prepare final build
+        run: |
+          cp build/html/* build/
+
+      # 8. Deploy to GitHub Pages
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v7
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build
+          publish_branch: gh-pages
