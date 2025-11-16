@@ -1,7 +1,7 @@
 
 # 🚀 LvL 1 Capture The Flag [CTF]
 
-![CTF](buildS/media/ctf-bg.jpg)
+![CTF](ctf-bg.jpg)
 
 
 ## 🧩 How to Participate
