@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: USERNAME/PRIVATE_REPO   # change to your private repo
-          token: ${{ SEC_TKEN }}
+          token: ${{ secrets.SEC_TKEN }}
           path: private-repo
 
       # 2. Setup Node.js
