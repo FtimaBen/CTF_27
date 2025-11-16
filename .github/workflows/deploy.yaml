@@ -15,7 +15,7 @@ jobs:
       - name: Checkout Private Repo
         uses: actions/checkout@v4
         with:
-          repository: USERNAME/PRIVATE_REPO   # change to your private repo
+          repository: FtimaBen/CTF   # change to your private repo
           token: ${{ secrets.SEC_TKEN }}
           path: private-repo
 
