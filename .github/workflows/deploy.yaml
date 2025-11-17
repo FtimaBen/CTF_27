@@ -73,12 +73,6 @@ jobs:
           mkdir -p build/media
           cp -r private-repo/src/media/* build/media/
 
-
-      # 8. Copy HTML root files
-      - name: Prepare final build
-        run: |
-          cp build/html/* build/
-
       # 9. Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
