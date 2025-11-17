@@ -1,7 +1,7 @@
 
 # 🚀 LvL 1 Capture The Flag [CTF]
 
-![CTF](ctf-bg.jpg)
+![CTF](https://github.com/FtimaBen/CTF_27/blob/5ef31d0205725fac0c2d32b5ad6ad13f1c4f9274/media/ctf-bg.jpg)
 
 
 ## 🧩 How to Participate

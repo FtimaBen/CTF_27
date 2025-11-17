@@ -30,7 +30,7 @@ jobs:
         run: |
           npm install -g javascript-obfuscator html-minifier-terser
 
-      # 4. Obfuscate JS
+      # Obfuscate JS without renaming globals
       - name: Obfuscate JS
         run: |
           mkdir -p build/js
@@ -43,8 +43,9 @@ jobs:
               --control-flow-flattening true \
               --string-array true \
               --string-array-encoding base64 \
-              --rename-globals true
+              --rename-globals false
           done
+
 
       # 5. Copy HTML and update JS references directly into build root
       - name: Copy HTML & update JS references
